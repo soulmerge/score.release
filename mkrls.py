@@ -33,9 +33,6 @@ import click
 from glob import glob
 
 
-here = os.path.dirname(__file__)
-
-
 def read_current_version(repo):
     if repo.startswith('py.'):
         content = open('setup.py').read()
@@ -59,7 +56,22 @@ def increment_version(version):
     return '.'.join(map(str, newparts))
 
 
+def fix_copyright_year(file=None):
+    content = open(file).read()
+    match = re.search(
+        r'(Copyright © )(2015.*?)( STRG.AT GmbH, Vienna, Austria)', content)
+    if not match:
+        return False
+    line = match.group(1) + '2015,2016' + match.group(3)
+    if match.group(0) == line:
+        return False
+    content = content.replace(match.group(0), line)
+    open(file, 'w').write(content)
+    return True
+
+
 def replace_version_string(file, regex, new):
+    fix_copyright_year(file)
     content = open(file).read()
     match = regex.search(content)
     if match:
@@ -84,7 +96,9 @@ def update_repo_version(repo, old, new):
     content = open(file).read()
     content = content.replace(old, new, 1)
     open(file, 'w').write(content)
+    fix_copyright_year('README.rst')
     if repo.startswith('py.'):
+        fix_copyright_year('setup.py')
         for (dirpath, dirnames, filenames) in os.walk('score'):
             for filename in filenames:
                 if not filename.endswith('.py'):
@@ -139,7 +153,7 @@ def repo_is_dirty():
 @click.argument('repository', type=click.Path(file_okay=False, dir_okay=True))
 def main(repository, version=None, pretend=False):
     assert repository.startswith('py.') or repository.startswith('js.')
-    os.chdir(os.path.join(here, repository))
+    os.chdir(repository)
     old_version = read_current_version(repository)
     if version is None:
         version = increment_version(old_version)
