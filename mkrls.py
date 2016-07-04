@@ -83,7 +83,7 @@ def replace_version_string(file, regex, new):
 pyversion_regex = r'''^(__version__ = ["'])(\d+\.\d+(?:\.\d+)?)(["'])$'''
 jsversion_regex = \
     r'''^(\s*(?:[a-zA-Z_]+\.__version__\s+=|["']?__version__["']?\s*:)''' \
-    r'''\s+["'])(\d+\.\d+(?:\.\d+)?)(["'][,;])$'''
+    r'''\s+["'])(\d+\.\d+(?:\.\d+)?)(["'][,;]?)$'''
 
 
 def update_repo_version(repo, old, new):
