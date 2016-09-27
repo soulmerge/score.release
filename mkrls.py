@@ -173,6 +173,12 @@ def main(repository, version=None, pretend=False):
         raise click.ClickException('Repository contains uncommited changes')
     print(old_version, '->', version)
     update_repo_version(repository, old_version, version)
+    if repository == 'py.doc':
+        print('Building documentation')
+        subprocess.check_call(
+            ['git', 'submodule', 'update', '--recursive', '--remote'])
+        subprocess.check_call(
+            ['make', 'clean', 'html', 'upload'], cwd='docs')
     publish(repository, old_version, version)
 
 
