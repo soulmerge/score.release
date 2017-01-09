@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright © 2015,2016 STRG.AT GmbH, Vienna, Austria
+# Copyright © 2015-2017 STRG.AT GmbH, Vienna, Austria
 #
 # This file is part of the The SCORE Framework.
 #
@@ -60,11 +60,19 @@ def fix_copyright_year(file=None):
     content = open(file).read()
     match = re.search(
         r'(Copyright © )(2015.*?)( STRG.AT GmbH, Vienna, Austria)', content)
-    if not match:
-        return False
-    line = match.group(1) + '2015,2016' + match.group(3)
-    if match.group(0) == line:
-        return False
+    if match:
+        line = match.group(1) + '2015-2017' + match.group(3)
+        if match.group(0) == line:
+            return False
+    else:
+        match = re.search(
+            r'(Copyright © )(2016.*?)( STRG.AT GmbH, Vienna, Austria)', content)
+        if match:
+            line = match.group(1) + '2016,2017' + match.group(3)
+            if match.group(0) == line:
+                return False
+        else:
+            return False
     content = content.replace(match.group(0), line)
     open(file, 'w').write(content)
     return True
