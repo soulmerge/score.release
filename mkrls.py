@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # Copyright © 2015-2018 STRG.AT GmbH, Vienna, Austria
+# Copyright © 2019 Necdet Can Ateşman, Vienna, Austria
 #
 # This file is part of the The SCORE Framework.
 #
@@ -132,7 +133,8 @@ def publish(repo, old, new):
     subprocess.check_call(['git', 'push', '--all'])
     subprocess.check_call(['git', 'push', '--tags'])
     if repo.startswith('py.'):
-        subprocess.check_call(['python', 'setup.py', 'sdist', 'upload'])
+        subprocess.check_call(['python', 'setup.py', 'sdist', 'bdist_wheel'])
+        subprocess.check_call(['twine', 'upload'] + glob('dist/*'))
     else:
         subprocess.check_call(['npm', 'publish'])
 
