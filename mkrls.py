@@ -137,7 +137,10 @@ def publish(repo, old, new):
     subprocess.check_call(['git', 'push', '--all'])
     subprocess.check_call(['git', 'push', '--tags'])
     if repo.startswith('py.'):
-        shutil.rmtree('dist')
+        try:
+            shutil.rmtree('dist')
+        except FileNotFoundError:
+            pass
         subprocess.check_call(['python', 'setup.py', 'sdist', 'bdist_wheel'])
         subprocess.check_call(['twine', 'upload'] + glob('dist/*'))
     else:
