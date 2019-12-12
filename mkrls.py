@@ -27,11 +27,13 @@
 # the discretion of STRG.AT GmbH also the competent court, in whose district
 # the Licensee has his registered seat, an establishment or assets.
 
-import re
-import subprocess
-import os
-import click
 from glob import glob
+import os
+import re
+import shutil
+import subprocess
+
+import click
 
 
 def read_current_version(repo):
@@ -67,14 +69,16 @@ def fix_copyright_year(file=None):
             return False
     else:
         match = re.search(
-            r'(Copyright © )(2016.*?)( STRG.AT GmbH, Vienna, Austria)', content)
+            r'(Copyright © )(2016.*?)( STRG.AT GmbH, Vienna, Austria)',
+            content)
         if match:
             line = match.group(1) + '2016-2018' + match.group(3)
             if match.group(0) == line:
                 return False
         else:
             match = re.search(
-                r'(Copyright © )(2017.*?)( STRG.AT GmbH, Vienna, Austria)', content)
+                r'(Copyright © )(2017.*?)( STRG.AT GmbH, Vienna, Austria)',
+                content)
             if match:
                 line = match.group(1) + '2017,2018' + match.group(3)
                 if match.group(0) == line:
@@ -133,6 +137,7 @@ def publish(repo, old, new):
     subprocess.check_call(['git', 'push', '--all'])
     subprocess.check_call(['git', 'push', '--tags'])
     if repo.startswith('py.'):
+        shutil.rmtree('dist')
         subprocess.check_call(['python', 'setup.py', 'sdist', 'bdist_wheel'])
         subprocess.check_call(['twine', 'upload'] + glob('dist/*'))
     else:
@@ -176,7 +181,7 @@ def main(repository, version=None, pretend=False):
         version = increment_version(old_version)
     elif not re.match(r'^[0-9]+\.[0-9]+\.[0-9]+$', version):
         raise click.ClickException(
-            'Invalid version number (must match `\d+.\d+.\d+`)')
+            r'Invalid version number (must match `\d+.\d+.\d+`)')
     else:
         if not check_new_version(repository, old_version, version):
             click.confirm(
